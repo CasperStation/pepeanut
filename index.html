@@ -7,6 +7,167 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<title>Pepeanut on Pulse</title>
 	<meta name="robots" content="max-image-preview:large">
+	
+	<!-- Firebase Analytics -->
+	<script type="module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+		import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+
+		// Your web app's Firebase configuration
+		const firebaseConfig = {
+			apiKey: "AIzaSyCrKvZ1gfy8sw0aPu-l6E9X3oM3ErfEKFY",
+			authDomain: "pepeanut-analytics.firebaseapp.com",
+			projectId: "pepeanut-analytics",
+			storageBucket: "pepeanut-analytics.firebasestorage.app",
+			messagingSenderId: "280110662610",
+			appId: "1:280110662610:web:69973f5a8b4c6891ce3e0b"
+		};
+
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+
+		// Track page views automatically
+		function trackPageView(pageName = null) {
+			const page = pageName || document.title || window.location.pathname;
+			logEvent(analytics, 'page_view', {
+				page_title: page,
+				page_location: window.location.href,
+				page_path: window.location.pathname
+			});
+		}
+
+		// Track user engagement events
+		function trackUserEngagement(action, elementName = null) {
+			logEvent(analytics, 'user_engagement', {
+				engagement_time_msec: Date.now(),
+				action: action,
+				element: elementName
+			});
+		}
+
+		// Track custom events
+		function trackCustomEvent(eventName, parameters = {}) {
+			logEvent(analytics, eventName, {
+				timestamp: Date.now(),
+				page_location: window.location.href,
+				...parameters
+			});
+		}
+
+		// Make tracking functions available globally
+		window.trackPageView = trackPageView;
+		window.trackUserEngagement = trackUserEngagement;
+		window.trackCustomEvent = trackCustomEvent;
+
+		// Initialize analytics tracking when DOM is ready
+		document.addEventListener('DOMContentLoaded', () => {
+			// Track initial page view
+			trackPageView();
+			
+			// Track scroll depth
+			let maxScrollDepth = 0;
+			window.addEventListener('scroll', () => {
+				const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+				if (scrollDepth > maxScrollDepth && !isNaN(scrollDepth)) {
+					maxScrollDepth = scrollDepth;
+					if (maxScrollDepth % 25 === 0 && maxScrollDepth > 0) { // Track at 25%, 50%, 75%, 100%
+						trackCustomEvent('scroll_depth', {
+							scroll_depth: maxScrollDepth,
+							page_title: document.title
+						});
+					}
+				}
+			});
+			
+			// Track time on page
+			let startTime = Date.now();
+			window.addEventListener('beforeunload', () => {
+				const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+				if (timeOnPage > 5) { // Only track if user spent more than 5 seconds
+					trackCustomEvent('time_on_page', {
+						time_seconds: timeOnPage,
+						page_title: document.title
+					});
+				}
+			});
+			
+			// Track clicks on important elements
+			document.addEventListener('click', (e) => {
+				const element = e.target;
+				let trackingData = null;
+				
+				// Track navigation clicks
+				if (element.tagName === 'A') {
+					trackingData = {
+						event_name: 'link_click',
+						link_url: element.href || '#',
+						link_text: element.textContent.trim().substring(0, 100)
+					};
+				}
+				
+				// Track button clicks
+				if (element.tagName === 'BUTTON' || element.classList.contains('btn') || element.classList.contains('button')) {
+					trackingData = {
+						event_name: 'button_click',
+						button_text: element.textContent.trim().substring(0, 100),
+						button_class: element.className
+					};
+				}
+				
+				// Track image clicks
+				if (element.tagName === 'IMG') {
+					trackingData = {
+						event_name: 'image_click',
+						image_src: element.src || '',
+						image_alt: element.alt || ''
+					};
+				}
+				
+				// Track social media clicks
+				if (element.classList.contains('social') || element.closest('.social-icons')) {
+					trackingData = {
+						event_name: 'social_click',
+						social_platform: element.title || element.alt || 'unknown'
+					};
+				}
+				
+				if (trackingData) {
+					trackCustomEvent(trackingData.event_name, trackingData);
+				}
+			});
+			
+			// Track form interactions
+			document.querySelectorAll('form').forEach(form => {
+				form.addEventListener('submit', (e) => {
+					trackCustomEvent('form_submit', {
+						form_id: form.id || 'unnamed_form',
+						form_action: form.action || window.location.href
+					});
+				});
+			});
+			
+			// Track video interactions if any
+			document.querySelectorAll('video').forEach(video => {
+				video.addEventListener('play', () => {
+					trackCustomEvent('video_play', {
+						video_src: video.src || video.currentSrc,
+						video_duration: video.duration || 0
+					});
+				});
+				
+				video.addEventListener('ended', () => {
+					trackCustomEvent('video_complete', {
+						video_src: video.src || video.currentSrc,
+						video_duration: video.duration || 0
+					});
+				});
+			});
+			
+			console.log('🔥 Firebase Analytics đã được khởi tạo thành công!');
+		});
+	</script>
 	<link rel="alternate" type="application/rss+xml" title="Pepeanut &raquo; Feed"
 		href="https://pepeanut.vip/?feed=rss2">
 	<link rel="alternate" type="application/rss+xml" title="Pepeanut &raquo; Comments Feed"
@@ -3545,7 +3706,7 @@ flexibility(document.documentElement);
 													<div class="elementor-widget-container">
 														<div class="elementor-button-wrapper">
 															<a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-shrink"
-																href="https://pump.tires/" target="_blank">
+																href="https://pump.tires/token/0xA99Ef52b2823dd414d453aA9442aBeFcf695805D/" target="_blank">
 																<span class="elementor-button-content-wrapper">
 																	<span class="elementor-button-text">PUMP.tires</span>
 																</span>
@@ -3629,7 +3790,7 @@ flexibility(document.documentElement);
 															<div class="elementor-widget-container">
 																<div class="elementor-button-wrapper">
 																	<a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-shrink"
-																		href="https://pump.tires/"
+																		href="https://pump.tires/token/0xA99Ef52b2823dd414d453aA9442aBeFcf695805D/"
 																		target="_blank">
 																		<span class="elementor-button-content-wrapper">
 																			<span class="elementor-button-text">Buy
@@ -3795,7 +3956,7 @@ flexibility(document.documentElement);
 														<div class="elementor-widget-container">
 															<div class="elementor-button-wrapper">
 																<a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-shrink"
-																	href="https://pump.tires/"
+																	href="https://pump.tires/token/0xA99Ef52b2823dd414d453aA9442aBeFcf695805D/"
 																	target="_blank">
 																	<span class="elementor-button-content-wrapper">
 																		<span class="elementor-button-text">Buy
